@@ -1,10 +1,8 @@
-import { Router } from 'express';
-import { v4 as uuidv4 } from 'uuid';
-import { db } from '../db.js';
+const express = require('express');
+const db = require('../db');
+const router = express.Router();
 
-const router = Router();
-
-router.get('/events', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const [rows] = await db.promise().query('SELECT * FROM events');
     res.json(rows);
@@ -12,10 +10,9 @@ router.get('/events', async (req, res) => {
     console.error('Fetch Error:', error);
     res.status(500).json({ error: 'Failed to fetch events' });
   }
-
 });
 
-router.get('/events/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const [rows] = await db.promise().query('SELECT * FROM events WHERE event_id = ?', [id]);
@@ -26,8 +23,7 @@ router.get('/events/:id', async (req, res) => {
   }
 });
 
-
-router.put('/events/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const {
     title,
@@ -62,7 +58,6 @@ router.put('/events/:id', async (req, res) => {
     ]);
 
     if (result.affectedRows === 0) return res.status(404).json({ error: 'Event not found' });
-
     res.json({ message: 'Event updated successfully' });
   } catch (error) {
     console.error('Update Error:', error);
@@ -70,8 +65,7 @@ router.put('/events/:id', async (req, res) => {
   }
 });
 
-
-router.delete('/events/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -79,9 +73,9 @@ router.delete('/events/:id', async (req, res) => {
     if (result.affectedRows === 0) return res.status(404).json({ error: 'Event not found' });
     res.json({ message: 'Event deleted successfully' });
   } catch (error) {
-    console.error('Delete Error:', error);
-    res.status(500).json({ error: 'Failed to delete event' });
+    console.error('Insert Error:', error);
+    res.status(500).json({ error: error.message || 'Failed to create event' });
   }
 });
 
-export default router;
+module.exports = router;

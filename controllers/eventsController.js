@@ -1,5 +1,5 @@
-import { randomUUID } from 'crypto';
-import { pool } from '../db.js';
+const { randomUUID } = require('crypto');
+const { pool } = require('../db');
 
 export async function createEvent(req, res) {
   try {
