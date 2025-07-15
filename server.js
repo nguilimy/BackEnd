@@ -1,11 +1,19 @@
 const express = require('express');
 const { v4: uuidv4 } = require('uuid');
-const db = require('./db');
+const dotenv = require('dotenv');
+const app = express();
+const db= require('./db');
+const userRoutes = require('./routes/userRoutes');
+const meRoutes = require('./routes/profileRoutes');
+const resetPasswordRoute = require('./routes/resetPassordRoute');
 const eventRouter = require('./routes/events');
 
-const app = express();
+dotenv.config();
+const port = process.env.PORT || 5000;
 app.use(express.json());
 
+// Event
+app.use('/events', eventRouter);
 app.post('/events', async (req, res) => {
   const id = uuidv4();
   const {
@@ -46,9 +54,11 @@ app.post('/events', async (req, res) => {
   }
 });
 
-app.use('/events', eventRouter);
+// User
+app.use('/api/user', userRoutes);
+app.use('/api/me', meRoutes);
+app.use('/api/resetPassword', resetPasswordRoute);
 
-const port = process.env.PORT || 5000;
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+app.listen(port, () =>{
+    console.log(`Server is running on port ${port}`);
 });
