@@ -28,6 +28,10 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.get('/dashboard', (req, res) =>{
+  res.send("welcome to Agura App")
+})
+
 // User
 app.use('/api/user', userRoutes);
 app.use('/api/me', meRoutes);

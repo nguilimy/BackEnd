@@ -1,65 +1,56 @@
 const express = require('express');
-const passport = require('passport');
 const router = express.Router();
-
-/**
- * @swagger
- * tags:
- *   name: Auth
- *   description: Login with Google OAuth
- */
+const passport = require('passport');
+const { googleLogin, googleCallback, getProfile } = require('../controllers/googleAuthController');
 
 /**
  * @swagger
  * /auth/google:
  *   get:
- *     summary: Login via Google
- *     tags: [Auth]
- *     description: Redirects to Google for authentication.
+ *     summary: Redirects the user to Google for authentication
+ *     description: Initiates the Google OAuth 2.0 login flow.
+ *     tags:
+ *       - Google Authentication
  *     responses:
  *       302:
- *         description: Redirect to Google Login page
+ *         description: Redirect to Google login
  */
-router.get('/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] })
-);
+router.get('/google', googleLogin);
 
 /**
  * @swagger
  * /auth/google/callback:
  *   get:
- *     summary: Callback after Google login
- *     tags: [Auth]
- *     description: Google redirects here after successful login.
+ *     summary: Google OAuth callback
+ *     description: Handles the callback after Google authenticates the user.
+ *     tags:
+ *       - Google Authentication
  *     responses:
- *       302:
- *         description: Redirect to /auth/profile
+ *       200:
+ *         description: Successfully authenticated
+ *       401:
+ *         description: Authentication failed
  */
-router.get('/google/callback',
-  passport.authenticate('google', { failureRedirect: '/' }),
-  (req, res) => {
-    res.redirect('/auth/profile');
-  }
+router.get(
+  '/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login', session: true }),
+  googleCallback
 );
 
 /**
  * @swagger
  * /auth/profile:
  *   get:
- *     summary: View the logged-in user's information
- *     tags: [Auth]
+ *     summary: Get logged-in user's profile
+ *     description: Returns the profile of the currently authenticated user.
+ *     tags:
+ *       - Google Authentication
  *     responses:
  *       200:
- *         description: Google user data
+ *         description: User profile data
  *       401:
- *         description: Not authenticated
+ *         description: Unauthorized access
  */
-router.get('/profile', (req, res) => {
-  if (!req.user) return res.status(401).send("Unauthorized");
-  res.send({
-    message: "Successfully logged in with Google",
-    user: req.user
-  });
-});
+router.get('/profile', getProfile);
 
 module.exports = router;
