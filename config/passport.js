@@ -13,12 +13,12 @@ passport.use(new GoogleStrategy({
     const email = profile.emails[0].value;
     const photo = profile.photos && profile.photos[0] ? profile.photos[0].value : null;
 
-    const [rows] = await db.promise().query('SELECT * FROM users WHERE email = ?', [email]);
+    const [rows] = await db.promise().query('SELECT * FROM user WHERE email = ?', [email]);
 
     if (rows.length === 0) {
       const user_id = uuidv4();
       await db.promise().query(
-        'INSERT INTO users (user_id, email, phone_number, profile_photo, role, password) VALUES (?, ?, NULL, ?, "Attendee", NULL)',
+        'INSERT INTO user (user_id, email, phone_number, profile_photo, role, password) VALUES (?, ?, NULL, ?, "Attendee", NULL)',
         [user_id, email, photo]
       );
       console.log('New user registered:', email);

@@ -11,11 +11,11 @@ exports.googleCallback = async (req, res) => {
     const email = req.user.emails[0].value;
     const photo = req.user.photos && req.user.photos[0] ? req.user.photos[0].value : null;
 
-    const [rows] = await db.promise().query('SELECT * FROM users WHERE email = ?', [email]);
+    const [rows] = await db.promise().query('SELECT * FROM user WHERE email = ?', [email]);
     
     if (rows.length === 0) {
       const user_id = uuidv4();
-      const sql = `INSERT INTO users (user_id, email, phone_number, profile_photo, role, password) VALUES (?, ?, NULL, ?, 'Attendee', NULL)`;
+      const sql = `INSERT INTO user (user_id, email, phone_number, profile_photo, role, password) VALUES (?, ?, NULL, ?, 'Attendee', NULL)`;
       await db.promise().query(sql, [user_id, email,photo]);
       console.log("Nouvel utilisateur Google enregistré :", email);
     }
