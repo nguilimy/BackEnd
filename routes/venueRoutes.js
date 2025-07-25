@@ -81,4 +81,89 @@ router.post('/add', authenticateToken, venueControllers.addVenue);
  */
 router.get('/getVenue', venueControllers.getVenue);
 
+/**
+ * @swagger
+ * /api/venue/updateVenue/{id}:
+ *   put:
+ *     summary: Update a venue by ID
+ *     tags:
+ *       - Venues
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: UUID of the venue to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Kigali Arena
+ *               location:
+ *                 type: string
+ *                 example: KN 5 Rd, Kigali
+ *               map_data:
+ *                 type: object
+ *                 properties:
+ *                   lat:
+ *                     type: number
+ *                     example: -1.9441
+ *                   lng:
+ *                     type: number
+ *                     example: 30.0619
+ *               capacity:
+ *                 type: integer
+ *                 example: 5000
+ *     responses:
+ *       200:
+ *         description: Venue updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Venue updated successfully
+ *       404:
+ *         description: Venue not found or unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Venue not found or you are not the admin
+ *       403:
+ *         description: Access denied, admin only
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Access denied, admin only
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ */
+router.put('/updateVenue/:id', authenticateToken, venueControllers.updateVenue);
+
 module.exports = router;

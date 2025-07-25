@@ -51,4 +51,29 @@ exports.getVenue = async (req, res) => {
         console.error('Fetch Error:', error);
         res.status(500).json({ error: 'Failed to fetch venues' });
     }
-}
+};
+
+exports.updateVenue = async (req, res) => {
+    const venueId = req.params.id;
+    const { name, location, map_data, capacity } = req.body;
+    const { user_id, role } = req.user;
+
+    if (role !== 'Admin') {
+        return res.status(403).json({ message: 'Access denied, admin only' });
+    }
+
+    try {
+        const mapDataString = JSON.stringify(map_data);
+        const sql = `UPDATE venue SET name = ?, location = ?, map_data = ?, capacity = ? WHERE venue_id = ? AND admin_id = ?`;
+        const [result] = await db.promise().query(sql, [name, location, mapDataString, capacity, venueId, user_id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Venue not found or you are not the admin' });
+        }
+
+        res.json({ message: 'Venue updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
