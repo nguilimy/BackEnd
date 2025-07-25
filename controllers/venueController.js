@@ -77,3 +77,26 @@ exports.updateVenue = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+exports.deleteVenue = async (req, res) => {
+    const venueId = req.params.id;
+    const { user_id, role } = req.user;
+
+    if (role !== 'Admin') {
+        return res.status(403).json({ message: 'Access denied, admin only' });
+    }
+
+    try {
+        const sql = `DELETE FROM venue WHERE venue_id = ? AND admin_id = ?`;
+        const [result] = await db.promise().query(sql, [venueId, user_id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Venue not found or you are not the admin' });
+        }
+
+        res.json({ message: 'Venue deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+}

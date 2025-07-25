@@ -166,4 +166,44 @@ router.get('/getVenue', venueControllers.getVenue);
  */
 router.put('/updateVenue/:id', authenticateToken, venueControllers.updateVenue);
 
+/**
+ * @swagger
+ * /api/venue/deleteVenue/{id}:
+ *   delete:
+ *     summary: Delete a venue by ID
+ *     tags:
+ *       - Venues
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: UUID of the venue to delete
+ *     responses:
+ *       200:
+ *         description: Venue deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Venue deleted successfully
+ *       404:
+ *         description: Venue not found or unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Venue not found or you are not the admin
+ */
+router.delete('/deleteVenue/:id', authenticateToken, venueControllers.deleteVenue);
+
 module.exports = router;
