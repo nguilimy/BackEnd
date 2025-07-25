@@ -36,3 +36,19 @@ exports.addVenue = async (req, res) => {
         return res.status(500).json({ message: 'Server error' });
     }
 };
+
+exports.getVenue = async (req, res) => {
+    try {
+        const [rows] = await db.promise().query('SELECT * FROM venue');
+
+        const venues = rows.map(venue => ({
+            ...venue,
+            map_data: venue.map_data ? JSON.parse(venue.map_data) : null
+        }));
+
+        res.json(venues);
+    } catch (error) {
+        console.error('Fetch Error:', error);
+        res.status(500).json({ error: 'Failed to fetch venues' });
+    }
+}
