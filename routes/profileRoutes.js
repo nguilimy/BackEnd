@@ -8,7 +8,7 @@ const profileController = require('../controllers/profileController');
  * /api/me/getUser:
  *   get:
  *     summary: Get current user profile
- *     tags: [User]
+ *     tags: [User Profile]
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -47,7 +47,7 @@ router.get('/getUser',authenticateToken, profileController.getUser);
  * /api/me/updateProfile:
  *   put:
  *     summary: Update user profile
- *     tags: [User]
+ *     tags: [User Profile]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
