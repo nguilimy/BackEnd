@@ -7,6 +7,7 @@ const userRoutes = require('./routes/userRoutes');
 const meRoutes = require('./routes/profileRoutes');
 const resetPasswordRoute = require('./routes/resetPassordRoute');
 const eventRouter = require('./routes/events');
+const ticketRoute = require('./routes/ticketRoute');
 
 dotenv.config();
 const port = process.env.PORT || 5000;
@@ -30,7 +31,7 @@ app.post('/events', async (req, res) => {
   const artist_lineup_json = JSON.stringify(artist_lineup);
 
   const sql = `
-    INSERT INTO events (
+    INSERT INTO event (
       event_id, title, description, date_time,
       venue_id, admin_id, category, artist_lineup, promo_video_url
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -58,6 +59,10 @@ app.post('/events', async (req, res) => {
 app.use('/api/user', userRoutes);
 app.use('/api/me', meRoutes);
 app.use('/api/resetPassword', resetPasswordRoute);
+
+// Ticket
+app.use('/api/ticket', ticketRoute);
+// Ticket Category
 
 app.listen(port, () =>{
     console.log(`Server is running on port ${port}`);
