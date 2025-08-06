@@ -1,68 +1,58 @@
 const express = require('express');
-const { v4: uuidv4 } = require('uuid');
 const dotenv = require('dotenv');
-const app = express();
+const session = require('express-session');
+const passport = require('passport');
+const swaggerUi = require('swagger-ui-express');
+
 const db= require('./db');
 const userRoutes = require('./routes/userRoutes');
 const meRoutes = require('./routes/profileRoutes');
 const resetPasswordRoute = require('./routes/resetPassordRoute');
 const eventRouter = require('./routes/events');
-const ticketRoute = require('./routes/ticketRoute');
+const authRoutes = require('./routes/googleAuth');
+const swaggerSpec = require('./swagger/swaggerConfig');
+const venueRouters = require('./routes/venueRoutes');
+const ticketRoutes = require('./routes/ticketRoute');
+
+const app = express();
 
 dotenv.config();
+require('./config/passport');
 const port = process.env.PORT || 5000;
+
+// Middlewares
 app.use(express.json());
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
-// Event
-app.use('/events', eventRouter);
-app.post('/events', async (req, res) => {
-  const id = uuidv4();
-  const {
-    title,
-    description,
-    date_time,
-    venue_id,
-    admin_id,
-    category,
-    artist_lineup,
-    promo_video_url
-  } = req.body;
-
-  const artist_lineup_json = JSON.stringify(artist_lineup);
-
-  const sql = `
-    INSERT INTO event (
-      event_id, title, description, date_time,
-      venue_id, admin_id, category, artist_lineup, promo_video_url
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
-  try {
-    const [result] = await db.promise().query(sql, [
-      id,
-      title,
-      description,
-      date_time,
-      venue_id,
-      admin_id,
-      category,
-      artist_lineup_json,
-      promo_video_url
-    ]);
-    res.status(201).json({ message: 'Event created', event_id: id });
-  } catch (error) {
-    console.error('Insert Error:', error);
-    res.status(500).json({ error: 'Failed to create event' });
-  }
-});
+app.get('/dashboard', (req, res) =>{
+  res.send("welcome to Agura App")
+})
 
 // User
 app.use('/api/user', userRoutes);
 app.use('/api/me', meRoutes);
 app.use('/api/resetPassword', resetPasswordRoute);
 
-// Ticket
-app.use('/api/ticket', ticketRoute);
-// Ticket Category
+// Venue
+app.use('/api/venue', venueRouters);
+
+// Event
+app.use('/events', eventRouter);
+
+// google auth
+app.use('/auth', authRoutes);
+
+// Swagger only for Google OAuth
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Ticket Routes
+app.use('/api/ticket', ticketRoutes);
 
 app.listen(port, () =>{
     console.log(`Server is running on port ${port}`);
