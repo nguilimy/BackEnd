@@ -8,7 +8,7 @@ exports.requestReset = async (req, res) => {
   const { emailOrPhone } = req.body;
 
   const [results] = await db.promise().query(
-    `SELECT user_id, email FROM users WHERE email = ? OR phone_number = ?`,
+    `SELECT user_id, email FROM user WHERE email = ? OR phone_number = ?`,
     [emailOrPhone, emailOrPhone]
   );
 
@@ -28,7 +28,10 @@ exports.requestReset = async (req, res) => {
   // Send the OTP
   await sendOTP(emailOrPhone, code);
 
-  res.json({ message: 'Code sent by email' });
+  const isEmail = emailOrPhone.includes('@');
+  res.json({
+    message: `Code sent by ${isEmail ? 'email' : 'SMS'}`
+  });
 };
 
 // Verify the code
@@ -65,7 +68,7 @@ exports.resetPassword = async (req, res) => {
 
   // Update in the database
   await db.promise().query(
-    `UPDATE users SET password = ? WHERE user_id = ?`,
+    `UPDATE user SET password = ? WHERE user_id = ?`,
     [hashed, user_id]
   );
 

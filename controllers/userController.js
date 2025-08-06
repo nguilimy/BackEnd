@@ -18,7 +18,7 @@ exports.register = async (req, res) => {
     try {
         // Check unique email
         if (email) {
-            const [rows] = await db.promise().query('SELECT * FROM users WHERE email = ?', [email]);
+            const [rows] = await db.promise().query('SELECT * FROM user WHERE email = ?', [email]);
             if (rows.length > 0) {
                 return res.status(409).json({ message: 'Email already exists' });
             }
@@ -26,7 +26,7 @@ exports.register = async (req, res) => {
 
         // Check unique phone number
         if (phone_number) {
-            const [rows] = await db.promise().query('SELECT * FROM users WHERE phone_number = ?', [phone_number]);
+            const [rows] = await db.promise().query('SELECT * FROM user WHERE phone_number = ?', [phone_number]);
             if (rows.length > 0) {
                 return res.status(409).json({ message: 'Phone number already exists' });
             }
@@ -35,7 +35,7 @@ exports.register = async (req, res) => {
         const hashedpassword = await bcrypt.hash(password, 10);
         const user_id = uuidv4();
 
-        const sql = `INSERT INTO users (user_id, email, phone_number, role, password) VALUES (?, ?, ?, 'Attendee', ?)`;
+        const sql = `INSERT INTO user (user_id, email, phone_number, role, password) VALUES (?, ?, ?, 'Attendee', ?)`;
         await db.promise().query(sql, [user_id, email || null, phone_number || null, hashedpassword]);
 
         return res.status(201).json({ message: 'User created successfully' });
@@ -54,7 +54,7 @@ exports.login = async (req, res) => {
   }
 
   try {
-    const sql = `SELECT * FROM users WHERE email = ? OR phone_number = ?`;
+    const sql = `SELECT * FROM user WHERE email = ? OR phone_number = ?`;
     const [results] = await db.promise().query(sql, [emailOrPhone, emailOrPhone]);
 
     if (results.length === 0) {
