@@ -12,6 +12,7 @@ const eventRouter = require('./routes/events');
 const authRoutes = require('./routes/googleAuth');
 const swaggerSpec = require('./swagger/swaggerConfig');
 const venueRouters = require('./routes/venueRoutes');
+const sectionRouters = require('./routes/sectionRoutes');
 
 const app = express();
 
@@ -40,6 +41,9 @@ app.use('/api/resetPassword', resetPasswordRoute);
 
 // Venue
 app.use('/api/venue', venueRouters);
+
+// Section
+app.use('/api/section', sectionRouters);
 
 // Event
 app.use('/events', eventRouter);
