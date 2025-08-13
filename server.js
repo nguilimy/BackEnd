@@ -22,7 +22,7 @@ dotenv.config();
 require('./config/passport');
 const port = process.env.PORT || 5000;
 
-app.use(cors({ origin: ['http://localhost:4000', 'https://test-uwzj.onrender.com'] }));
+app.use(cors({ origin: ['http://localhost:4000', 'https://backend-nu2c.onrender.com'] }));
 
 // Middlewares
 app.use(express.json());

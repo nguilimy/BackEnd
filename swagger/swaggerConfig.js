@@ -11,7 +11,7 @@ const options = {
     servers: [
       {
         url: process.env.NODE_ENV === 'production'
-          ? 'https://test-uwzj.onrender.com'
+          ? 'https://backend-nu2c.onrender.com'
           : 'http://localhost:4000',
       },
     ],
