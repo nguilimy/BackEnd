@@ -12,6 +12,7 @@ const eventRouter = require('./routes/events');
 const authRoutes = require('./routes/googleAuth');
 const swaggerSpec = require('./swagger/swaggerConfig');
 const venueRouters = require('./routes/venueRoutes');
+const ticketRoutes = require('./routes/ticketRoute');
 const sectionRouters = require('./routes/sectionRoutes');
 const seatRoutes = require('./routes/seatRoutes');
 
@@ -57,6 +58,9 @@ app.use('/auth', authRoutes);
 
 // Swagger only for Google OAuth
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Ticket Routes
+app.use('/api/ticket', ticketRoutes);
 
 app.listen(port, () =>{
     console.log(`Server is running on port ${port}`);
