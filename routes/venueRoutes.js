@@ -83,6 +83,26 @@ router.get('/getVenue', venueControllers.getVenue);
 
 /**
  * @swagger
+ * /api/venue/getVenue/{id}:
+ *   get:
+ *     summary: Get a venue by ID
+ *     tags: [Venues]
+ *     responses:
+ *       200:
+ *         description: venue detail
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       404:
+ *         description: venue not found
+ *       500:
+ *         description: error server
+ */
+router.get('/getVenue/:id', venueControllers.getVenueById);
+
+/**
+ * @swagger
  * /api/venue/updateVenue/{id}:
  *   put:
  *     summary: Update a venue by ID

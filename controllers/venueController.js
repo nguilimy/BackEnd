@@ -99,4 +99,18 @@ exports.deleteVenue = async (req, res) => {
         console.error(error);
         res.status(500).json({ message: 'Server error' });
     }
-}
+};
+
+exports.getVenueById = async (req, res) => {
+    const { id } = req.params;
+    try {
+      const [rows] = await db.promise().query('SELECT * FROM venue WHERE venue_id = ?', [id]);
+      if (rows.length === 0) {
+        return res.status(404).json({ error: 'Venue not found' });
+      }
+      res.json(rows[0]);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Server error' });
+    }
+  };
