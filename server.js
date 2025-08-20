@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const session = require('express-session');
 const passport = require('passport');
 const swaggerUi = require('swagger-ui-express');
+const cors = require('cors');
 
 const db= require('./db');
 const userRoutes = require('./routes/userRoutes');
@@ -22,6 +23,8 @@ const app = express();
 dotenv.config();
 require('./config/passport');
 const port = process.env.PORT || 5000;
+
+app.use(cors({ origin: ['http://localhost:4000', 'https://backend-nu2c.onrender.com'] }));
 
 // Middlewares
 app.use(express.json());
