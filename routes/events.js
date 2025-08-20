@@ -1,122 +1,160 @@
 const express = require('express');
-const { v4: uuidv4 } = require('uuid');
-const db = require('../db');
 const router = express.Router();
+const eventController = require('../controllers/eventsController');
 
-router.get('/', async (req, res) => {
-  try {
-    const [rows] = await db.promise().query('SELECT * FROM events');
-    res.json(rows);
-  } catch (error) {
-    console.error('Fetch Error:', error);
-    res.status(500).json({ error: 'Failed to fetch events' });
-  }
-});
+/**
+ * @swagger
+ * /events:
+ *   get:
+ *     summary: Get all events
+ *     tags: [Events]
+ *     responses:
+ *       200:
+ *         description: List of events
+ *       500:
+ *         description: Server error
+ */
+router.get('/', eventController.getAllEvents);
 
-router.get('/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const [rows] = await db.promise().query('SELECT * FROM events WHERE event_id = ?', [id]);
-    if (rows.length === 0) return res.status(404).json({ error: 'Event not found' });
-    res.json(rows[0]);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch event' });
-  }
-});
+/**
+ * @swagger
+ * /events/{id}:
+ *   get:
+ *     summary: Get event by ID
+ *     tags: [Events]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Event ID
+ *     responses:
+ *       200:
+ *         description: Event details
+ *       404:
+ *         description: Event not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/:id', eventController.getEventById);
 
-router.put('/:id', async (req, res) => {
-  const { id } = req.params;
-  const {
-    title,
-    description,
-    date_time,
-    venue_id,
-    admin_id,
-    category,
-    artist_lineup,
-    promo_video_url
-  } = req.body;
+/**
+ * @swagger
+ * /events:
+ *   post:
+ *     summary: Create a new event
+ *     tags: [Events]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               date_time:
+ *                 type: string
+ *                 format: date-time
+ *               venue_id:
+ *                 type: string
+ *               admin_id:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *               artist_lineup:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               promo_video_url:
+ *                 type: string
+ *             required:
+ *               - title
+ *               - description
+ *               - date_time
+ *     responses:
+ *       201:
+ *         description: Event created successfully
+ *       400:
+ *         description: Invalid input
+ *       500:
+ *         description: Server error
+ */
+router.post('/', eventController.createEvent);
 
-  const artist_lineup_json = JSON.stringify(artist_lineup);
+/**
+ * @swagger
+ * /events/{id}:
+ *   put:
+ *     summary: Update an event
+ *     tags: [Events]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Event ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               date_time:
+ *                 type: string
+ *                 format: date-time
+ *               venue_id:
+ *                 type: string
+ *               admin_id:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *               artist_lineup:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               promo_video_url:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Event updated successfully
+ *       404:
+ *         description: Event not found
+ *       500:
+ *         description: Server error
+ */
+router.put('/:id', eventController.updateEvent);
 
-  const sql = `
-    UPDATE events SET
-      title = ?, description = ?, date_time = ?, venue_id = ?, admin_id = ?, 
-      category = ?, artist_lineup = ?, promo_video_url = ?
-    WHERE event_id = ?`;
-
-  try {
-    const [result] = await db.promise().query(sql, [
-      title,
-      description,
-      date_time,
-      venue_id,
-      admin_id,
-      category,
-      artist_lineup_json,
-      promo_video_url,
-      id
-    ]);
-
-    if (result.affectedRows === 0) return res.status(404).json({ error: 'Event not found' });
-    res.json({ message: 'Event updated successfully' });
-  } catch (error) {
-    console.error('Update Error:', error);
-    res.status(500).json({ error: 'Failed to update event' });
-  }
-});
-
-router.delete('/:id', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const [result] = await db.promise().query('DELETE FROM events WHERE event_id = ?', [id]);
-    if (result.affectedRows === 0) return res.status(404).json({ error: 'Event not found' });
-    res.json({ message: 'Event deleted successfully' });
-  } catch (error) {
-    console.error('Insert Error:', error);
-    res.status(500).json({ error: error.message || 'Failed to create event' });
-  }
-});
-
-router.post('/register', async (req, res) => {
-  const id = uuidv4();
-  const {
-    title,
-    description,
-    date_time,
-    venue_id,
-    admin_id,
-    category,
-    artist_lineup,
-    promo_video_url
-  } = req.body;
-
-  const artist_lineup_json = JSON.stringify(artist_lineup);
-
-  const sql = `
-    INSERT INTO events (
-      event_id, title, description, date_time,
-      venue_id, admin_id, category, artist_lineup, promo_video_url
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
-  try {
-    const [result] = await db.promise().query(sql, [
-      id,
-      title,
-      description,
-      date_time,
-      venue_id,
-      admin_id,
-      category,
-      artist_lineup_json,
-      promo_video_url
-    ]);
-    res.status(201).json({ message: 'Event created', event_id: id });
-  } catch (error) {
-    console.error('Insert Error:', error);
-    res.status(500).json({ error: 'Failed to create event' });
-  }
-});
+/**
+ * @swagger
+ * /events/{id}:
+ *   delete:
+ *     summary: Delete an event
+ *     tags: [Events]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Event ID
+ *     responses:
+ *       200:
+ *         description: Event deleted successfully
+ *       404:
+ *         description: Event not found
+ *       500:
+ *         description: Server error
+ */
+router.delete('/:id', eventController.deleteEvent);
 
 module.exports = router;

@@ -16,6 +16,7 @@ const venueRouters = require('./routes/venueRoutes');
 const ticketRoutes = require('./routes/ticketRoute');
 const sectionRouters = require('./routes/sectionRoutes');
 const seatRoutes = require('./routes/seatRoutes');
+const ticketCategoryRoutes = require('./routes/ticketCategoryRoutes');
 
 const app = express();
 
@@ -64,6 +65,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Ticket Routes
 app.use('/api/ticket', ticketRoutes);
+
+// Ticket Category Routes
+app.use('/api/ticketcategory', ticketCategoryRoutes);
 
 app.listen(port, () =>{
     console.log(`Server is running on port ${port}`);
